@@ -41,20 +41,31 @@
                             <div class="row">
                                 <div class="form-group col-md-6">
                                     <label for="country">Country:</label>
-                                    <select class="form-control" data-bind="options: $root.Countries,
-                                    value: chosedCustomer().Address().Country().CountryName, optionsCaption:'Select your country...'">
-                                    </select>
+                                    <input id="country" list="countryList" class="form-control" 
+                                           data-bind="value: chosedCustomer().Address().Country().CountryName"
+                                           placeholder="Country"/>
+                                    <datalist id="countryList" data-bind="foreach: $root.Countries">
+                                        <option data-bind="value: $data"></option>
+                                    </datalist>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="city">City:</label>
-                                    <input type="text" id="city" class="form-control"
-                                           placeholder="City" data-bind="value: chosedCustomer().Address().City" />
+                                    <input id="city" list="cityList" class="form-control"
+                                           data-bind="value: chosedCustomer().Address().City"
+                                           placeholder="City" />
+                                    <datalist id="cityList" data-bind="foreach: $root.Cities">
+                                        <option data-bind="value: $data"></option>
+                                    </datalist>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="street">Street:</label>
-                                <input type="text" id="street" class="form-control"
-                                       placeholder="Street" data-bind="value: chosedCustomer().Address().Street" />
+                                <input id="street" list="streetList" class="form-control"
+                                       data-bind="value: chosedCustomer().Address().Street"
+                                       placeholder="Street" />
+                                <datalist id="streetList" data-bind="foreach: $root.Streets">
+                                    <option data-bind="value: $data"></option>
+                                </datalist>
                             </div>
 
                             <button type="button" class="btn btn-success" id="Save"

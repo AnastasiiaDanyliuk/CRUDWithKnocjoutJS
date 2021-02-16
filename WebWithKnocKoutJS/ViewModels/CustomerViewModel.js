@@ -26,6 +26,8 @@ var Country = function (country) {
 var CusViewModel = function () {
 	var self = this;
 	self.Countries = ko.observableArray([]);
+	self.Cities = ko.observableArray([]);
+	self.Streets = ko.observableArray([]);
 
 	self.Customers = ko.observableArray([]);
 
@@ -36,6 +38,22 @@ var CusViewModel = function () {
 			.done(function (data) {
 				self.Countries($.map(data,
 					function (country) { return country.CountryName }));
+			});
+	};
+
+	self.getCities = function () {
+		self.request.sendRequest("GET", "/api/Addresses/cities")
+			.done(function (data) {
+				self.Cities($.map(data,
+					function (city) { return city }));
+			});
+	};
+
+	self.getStreets = function () {
+		self.request.sendRequest("GET", "/api/Addresses/streets")
+			.done(function (data) {
+				self.Streets($.map(data,
+					function (street) { return street }));
 			});
 	};
 
@@ -52,7 +70,15 @@ var CusViewModel = function () {
 		FirstName: "",
 		LastName: "",
 		Email: "",
-		Country: ""
+		Address: {
+			AddressID: 0,
+			Country: {
+				CountryID: 0,
+				CountryName: "",
+			},
+			City: "",
+			Street: "",
+		}
 	};
 
 	self.chosedCustomer = ko.observable(new Customer(defaultCustomer));
@@ -130,10 +156,12 @@ var CusViewModel = function () {
 	function updateData() {
 		self.getChartLine();
 		self.getCustomers();
+		self.getCountries();
+		self.getCities();
+		self.getStreets();
 	};
 
 	updateData();
-	self.getCountries();
 };
 
 ko.applyBindings(new CusViewModel()); 

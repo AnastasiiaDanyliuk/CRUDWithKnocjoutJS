@@ -9,10 +9,16 @@ namespace WebWithKnocKoutJS.Services.Implementations
     public class CustomerService : ICustomerService
     {
         private readonly DBCustomerEntities db;
+        private readonly ICountryService countryService;
+        private readonly IAddressService addressService;
 
-        public CustomerService(DBCustomerEntities dBCustomerEntities)
+        public CustomerService(DBCustomerEntities dBCustomerEntities, 
+                                ICountryService countryService,
+                                IAddressService addressService)
         {
             db = dBCustomerEntities;
+            this.countryService = countryService;
+            this.addressService = addressService;
         }
 
         public List<Customer> Get()
@@ -27,22 +33,20 @@ namespace WebWithKnocKoutJS.Services.Implementations
 
         public Customer Add(Customer customer)
         {
-            var customerCountry = db.Countries.Where(country => country.CountryName ==
-                customer.Address.Country.CountryName).FirstOrDefault();
+            var customerCountry = countryService.Get(customer.Address.Country);
+            if(customerCountry == null)
+            {
+                customerCountry = countryService.Add(customer.Address.Country);
+            }
 
-            var customerAddress = db.Addresses.Where(addr => addr.CountryRef == customerCountry.CountryID &&
-                addr.City == customer.Address.City && addr.Street == customer.Address.Street)
-                .FirstOrDefault();
+            var customerAddress = addressService.Get(customer.Address, customerCountry.CountryID);
 
             if (customerAddress == null)
             {
-                customerAddress = db.Addresses.Add(new Address
-                {
-                    Country = customerCountry,
-                    CountryRef = customerCountry.CountryID,
-                    City = customer.Address.City,
-                    Street = customer.Address.Street,
-                });
+                var address = customer.Address;
+                address.Country = customerCountry;
+                address.CountryRef = customerCountry.CountryID;
+                customerAddress = addressService.Add(address);
             }
 
             var newCustomer = db.Customers.Add(new Customer
@@ -60,16 +64,15 @@ namespace WebWithKnocKoutJS.Services.Implementations
 
         public bool Delete(Customer customer)
         {
-            var customerCountry = db.Countries.Where(
-                country => country.CountryName == customer.Address.Country.CountryName).FirstOrDefault();
-            var address = db.Addresses.Where(addr => addr.CountryRef == customerCountry.CountryID &&
-                addr.City == customer.Address.City && addr.Street == customer.Address.Street)
-                .FirstOrDefault();
+            var customerCountry = countryService.Get(customer.Address.Country);
+
+            var address = addressService.Get(customer.Address, customerCountry.CountryID);
+
             var deletedCustomer = db.Customers.Remove(customer);
 
             if (address.Customers.Count() == 0)
             {
-                var deletedAddress = db.Addresses.Remove(address);
+                addressService.Remove(address);
             }
 
             db.SaveChanges();
@@ -78,16 +81,15 @@ namespace WebWithKnocKoutJS.Services.Implementations
 
         public Customer Update(Customer customer, Customer newCustomer)
         {
-            var customerCountry = db.Countries.Where(
-                  country => country.CountryName == newCustomer.Address.Country.CountryName).FirstOrDefault();
+            var customerCountry = countryService.Get(newCustomer.Address.Country);
+            if (customerCountry == null)
+            {
+                customerCountry = countryService.Add(newCustomer.Address.Country);
+            }
 
-            var oldAddress = db.Addresses.Where(address => address.CountryRef == customer.Address.Country.CountryID &&
-                address.City == customer.Address.City && address.Street == customer.Address.Street)
-                .FirstOrDefault();
+            var oldAddress = customer.Address;
 
-            var newAddress = db.Addresses.Where(address => address.CountryRef == customerCountry.CountryID &&
-                address.City == newCustomer.Address.City && address.Street == newCustomer.Address.Street)
-                .FirstOrDefault();
+            var newAddress = addressService.Get(newCustomer.Address, customerCountry.CountryID);
 
             if (newAddress != null)
             {
@@ -95,29 +97,21 @@ namespace WebWithKnocKoutJS.Services.Implementations
                 customer.AddressRef = newAddress.AddressID;
                 if (oldAddress.Customers.Count() == 1)
                 {
-                    var address = db.Addresses.Where(addr => addr.AddressID == oldAddress.AddressID).FirstOrDefault();
-                    db.Addresses.Remove(address);
+                    var address = addressService.Get(oldAddress.AddressID);
+                    addressService.Remove(address);
                 }
             }
             else
             {
                 var address = newCustomer.Address;
-                address.Country = oldAddress.Country;
-                address.CountryRef = oldAddress.CountryRef;
+                address.Country = customerCountry;
+                address.CountryRef = customerCountry.CountryID;
 
                 if (oldAddress.Customers.Count() != 1)
                 {
-                    address = db.Addresses.Add(new Address
-                    {
-                        City = newCustomer.Address.City,
-                        Street = newCustomer.Address.Street,
-                        Country = customerCountry,
-                        CountryRef = customerCountry.CountryID,
-                    });
-                    db.SaveChanges();
-                    address = db.Addresses.Where(addr => addr.CountryRef == address.CountryRef &&
-                        addr.City == address.City && addr.Street == addr.Street).FirstOrDefault();
+                    address = addressService.Add(address);
 
+                    address = addressService.Get(address, address.CountryRef);
                 }
 
                 db.Entry(customer.Address).CurrentValues.SetValues(address);
@@ -129,6 +123,7 @@ namespace WebWithKnocKoutJS.Services.Implementations
 
             db.Entry(customer).State = EntityState.Modified;
             db.SaveChanges();
+
             return customer;
         }
 
