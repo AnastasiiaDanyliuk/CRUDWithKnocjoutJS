@@ -507,6 +507,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Address.cs">
+      <DependentUpon>CustomerModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -539,8 +542,12 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\CountriesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Country.cs">
+      <DependentUpon>CustomerModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Customer.cs">
       <DependentUpon>CustomerModel.tt</DependentUpon>
     </Compile>
@@ -563,9 +570,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastucture\NinjectResolver.cs" />
-    <Compile Include="Models\CustomerPerCountry.cs" />
+    <Compile Include="Dto\CustomerPerCountry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Implementations\CountryService.cs" />
     <Compile Include="Services\Implementations\CustomerService.cs" />
+    <Compile Include="Services\Interfaces\ICountryService.cs" />
     <Compile Include="Services\Interfaces\ICustomerService.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -625,6 +634,7 @@
     <Content Include="Scripts\knockout.mapping.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="ViewModels\CustomerViewModel.js" />
+    <Content Include="ViewModels\Customer\DataManager.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -641,9 +651,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Index.html" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\Countries\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
   </ItemGroup>

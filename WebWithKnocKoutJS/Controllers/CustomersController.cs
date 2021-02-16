@@ -1,5 +1,4 @@
 ﻿using System.Web.Http;
-using WebWithKnocKoutJS.Models;
 using WebWithKnocKoutJS.Services.Interfaces;
 
 namespace WebWithKnocKoutJS.Controllers

@@ -51,6 +51,7 @@ namespace WebWithKnocKoutJS.Infrastucture
 
         private IKernel AddRequestBindings(IKernel kernel)
         {
+            kernel.Bind<ICountryService>().To<CountryService>().InSingletonScope();
             kernel.Bind<ICustomerService>().To<CustomerService>().InSingletonScope();
             return kernel;
         }

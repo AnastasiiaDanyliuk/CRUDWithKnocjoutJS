@@ -4,8 +4,12 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="fa08b14cb2ab441993fe04a4788417cd" Name="Diagram1">
-        <EntityTypeShape EntityType="DBCustomerModel.Customer" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+      <Diagram DiagramId="66c202e640de4eefbe514630803965c9" Name="Diagram1">
+        <EntityTypeShape EntityType="DBCustomerModel.Address" Width="1.5" PointX="3" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBCustomerModel.Country" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBCustomerModel.Customer" Width="1.5" PointX="5.25" PointY="0.875" IsExpanded="true" />
+        <AssociationConnector Association="DBCustomerModel.FK_AddressCountry" ManuallyRouted="false" />
+        <AssociationConnector Association="DBCustomerModel.FK_CustomerAddress" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

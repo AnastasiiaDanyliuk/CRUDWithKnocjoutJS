@@ -21,44 +21,58 @@
                     </div>
                     <div class="panel-body">
                         <form>
-                            <div class="form-group">
-                                <label for="FirstName">First name:</label>
-                                <input type="text" id="FirstName" class="form-control"
-                                       placeholder="First Name" data-bind="value: chosedCustomer().FirstName" />
-                            </div>
-                            <div class="form-group">
-                                <label for="LastName">Last name:</label>
-                                <input type="text" id="LastName" class="form-control"
-                                       placeholder="Last Name" data-bind="value: chosedCustomer().LastName" />
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="FirstName">First name:</label>
+                                    <input type="text" id="FirstName" class="form-control"
+                                           placeholder="First Name" data-bind="value: chosedCustomer().FirstName" />
+                                </div>
+                                <div class="form-group col-lg-6">
+                                    <label for="LastName">Last name:</label>
+                                    <input type="text" id="LastName" class="form-control"
+                                           placeholder="Last Name" data-bind="value: chosedCustomer().LastName" />
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="email">E-mail:</label>
                                 <input type="text" id="email" class="form-control"
                                        placeholder="Email" data-bind="value: chosedCustomer().Email" />
                             </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="country">Country:</label>
+                                    <select class="form-control" data-bind="options: $root.Countries,
+                                    value: chosedCustomer().Address().Country().CountryName, optionsCaption:'Select your country...'">
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="city">City:</label>
+                                    <input type="text" id="city" class="form-control"
+                                           placeholder="City" data-bind="value: chosedCustomer().Address().City" />
+                                </div>
+                            </div>
                             <div class="form-group">
-                                <label for="country">Country:</label>
-                                <select class="form-control" data-bind="options: $root.Countries,
-                                    value: chosedCustomer().Country, optionsCaption:'Select your country...'">
-                                </select>
+                                <label for="street">Street:</label>
+                                <input type="text" id="street" class="form-control"
+                                       placeholder="Street" data-bind="value: chosedCustomer().Address().Street" />
                             </div>
 
                             <button type="button" class="btn btn-success" id="Save"
-                                    data-bind="click: addCustomer">
+                                    data-bind="click: addCustomer, visible: !isCustomerChosed()">
                                 <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save
                             </button>
 
                             <button type="button" class="btn btn-info" id="Clear"
-                                    data-bind="click: $root.clearCustomer">
+                                    data-bind="click: $root.clearCustomer, visible: !isCustomerChosed()">
                                 <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Clear
                             </button>
 
                             <button type="button" class="btn btn-warning" style="display:none;" id="Update"
-                                    data-bind="click: updateCustomer">
+                                    data-bind="click: updateCustomer, visible: isCustomerChosed()">
                                 <span class="glyphicon glyphicon-pencil"></span>Update
                             </button>
                             <button type="button" class="btn btn-default" style="display:none;" id="Cancel"
-                                    data-bind="click: cancel">
+                                    data-bind="click: cancel, visible: isCustomerChosed()">
                                 <span class="glyphicon glyphicon-remove"></span>Cancel
                             </button>
                         </form>
@@ -99,7 +113,7 @@
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>E-mail</th>
-                                    <th>Country</th>
+                                    <th>Address</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -115,7 +129,7 @@
                                     <td> <span data-bind="text: FirstName"></span></td>
                                     <td> <span data-bind="text: LastName"></span></td>
                                     <td> <span data-bind="text: Email"></span></td>
-                                    <td> <span data-bind="text: Country"></span></td>
+                                    <td> <span data-bind="text: Address().getAddress"></span></td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-xs"
                                                 data-bind="click: $root.deleteCustomer">
@@ -135,6 +149,7 @@
     <script src="../../Scripts/jquery-3.4.1.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
     <script src="../../Scripts/knockout-3.5.1.js"></script>
+    <script src="ViewModels/Customer/DataManager.js"></script>
     <script src="../../ViewModels/CustomerViewModel.js"></script>
 </body>
 </html>

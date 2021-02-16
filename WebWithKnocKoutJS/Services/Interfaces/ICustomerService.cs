@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using WebWithKnocKoutJS.Models;
+using WebWithKnocKoutJS.Dto;
 
 namespace WebWithKnocKoutJS.Services.Interfaces
 {

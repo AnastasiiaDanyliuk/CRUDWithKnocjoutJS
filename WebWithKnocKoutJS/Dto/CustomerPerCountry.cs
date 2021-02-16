@@ -1,4 +1,4 @@
-﻿namespace WebWithKnocKoutJS.Models
+﻿namespace WebWithKnocKoutJS.Dto
 { 
     public class CustomerPerCountry
     {

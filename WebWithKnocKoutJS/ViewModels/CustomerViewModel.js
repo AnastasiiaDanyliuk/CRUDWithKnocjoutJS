@@ -1,31 +1,50 @@
-﻿var Customer = function(customer){
+﻿
+var Customer = function (customer) {
 	this.CustId = ko.observable(customer.CustID);
 	this.FirstName = ko.observable(customer.FirstName);
 	this.LastName = ko.observable(customer.LastName);
 	this.Email = ko.observable(customer.Email);
-	this.Country = ko.observable(customer.Country);
+	this.Address = ko.observable(new Address(customer.Address));
+};
+
+var Address = function (address) {
+	this.AddressID = ko.observable(address?.AddressID);
+	this.Country = ko.observable(new Country(address?.Country));
+	this.City = ko.observable(address?.City);
+	this.Street = ko.observable(address?.Street);
+
+	this.getAddress = this.Country().CountryName() + ', '
+		+ (this.City() != null ? this.City() : ' ') + ', '
+		+ (this.Street() != null ? this.Street() : ' ');
+};
+
+var Country = function (country) {
+	this.CountryID = ko.observable(country?.CountryID);
+	this.CountryName = ko.observable(country?.CountryName);
 };
 
 var CusViewModel = function () {
 	var self = this;
-	self.Countries = ko.observableArray(["Ukraine", "Poland", "Germany", "England"]);
+	self.Countries = ko.observableArray([]);
 
 	self.Customers = ko.observableArray([]);
 
+	self.request = new DataManager();
+
+	self.getCountries = function () {
+		self.request.sendRequest("GET", "/api/Countries/")
+			.done(function (data) {
+				self.Countries($.map(data,
+					function (country) { return country.CountryName }));
+			});
+	};
+
 	self.getCustomers = function () {
-		$.ajax({
-			type: "GET",
-			url: "/api/Customers/",
-			contentType: 'application/json',
-			dataType: 'json',
-			success: function (data) {
+		self.request.sendRequest("GET", "/api/Customers/")
+			.done(function (data) {
 				self.Customers($.map(data,
 					function (customer) { return new Customer(customer) }));
-			},
-			error: function (error) {
-				alert('Error: ' + error.responseJSON.ExceptionMessage);
-			}
-		});
+			});
 	};
 
 	var defaultCustomer = {
@@ -37,100 +56,55 @@ var CusViewModel = function () {
 	};
 
 	self.chosedCustomer = ko.observable(new Customer(defaultCustomer));
+	self.isCustomerChosed = ko.observable(false);
 	self.getCustomerDetail = function (customer) {
-		$.ajax({
-			type: "GET",
-			url: "/api/Customers/" + customer.CustId(),
-			contentType: 'application/json',
-			dataType: 'json',
-			success: function (data) {
+		self.request.sendRequest("GET", "/api/Customers/" + customer.CustId())
+			.done(function (data) {
 				self.chosedCustomer(new Customer(data));
-				$('#Update').show();
-				$('#Cancel').show();
-
-				$('#Save').hide();
-				$('#Clear').hide();
-			},
-			error: function (error) {
-				alert('Error: ' + error.responseJSON.ExceptionMessage);
-			}
-		});
+				self.isCustomerChosed(true);
+			});
 	};
 
 	self.clearCustomer = function () {
 		self.chosedCustomer(new Customer(defaultCustomer));
+		self.isCustomerChosed(false);
 	}
 
 	self.cancel = function () {
 		self.clearCustomer();
-		$('#Update').hide();
-		$('#Cancel').hide();
-
-		$('#Save').show();
-		$('#Clear').show();
 	};
 
 	self.addCustomer = function (customer) {
-		$.ajax({
-			type: "POST",
-			url: "/api/Customers/",
-			contentType: 'application/json',
-			dataType: 'json',
-			data: ko.toJSON(customer.chosedCustomer()),
-			success: function () {
+		self.request.sendRequest("POST", "/api/Customers/", ko.toJSON(customer.chosedCustomer()))
+			.done(function () {
 				self.clearCustomer();
-				alert("Customer is successfully added");
 				updateData();
-			},
-			error: function (error) {
-				alert('Error: ' + error.responseJSON.ExceptionMessage);
-			}
-		});
+				alert("Customer is successfully added");
+			});
 	};
 
 	self.updateCustomer = function (customer) {
-		$.ajax({
-			type: "PUT",
-			url: "/api/Customers/",
-			contentType: 'application/json',
-			dataType: 'json',
-			data: ko.toJSON(customer.chosedCustomer()),
-			success: function () {
-				alert("Customer is successfully updated");
+		self.request.sendRequest("PUT", "/api/Customers/", ko.toJSON(customer.chosedCustomer()))
+			.done(function () {
 				updateData();
+				alert("Customer is successfully updated");
 				self.cancel();
-			},
-			error: function (error) {
-				alert('Error: ' + error.responseJSON.ExceptionMessage);
-			}
-		});
+			});
 	};
 
 	self.deleteCustomer = function (customer) {
-		$.ajax({
-			type: "DELETE",
-			url: "/api/Customers/" + customer.CustId(),
-			contentType: 'application/json',
-			dataType: 'json',
-			success: function (data) {
+		self.request.sendRequest("DELETE", "/api/Customers/" + customer.CustId())
+			.done(function (data) {
 				if (data) {
-					alert("Customer is successfully deleted");
 					updateData();
+					alert("Customer is successfully deleted");
 				}
-			},
-			error: function (error) {
-				alert('Error: ' + error.responseJSON.ExceptionMessage);
-			}
-		});
+			});
 	};
 
 	self.getChartLine = function () {
-		$.ajax({
-			type: "GET",
-			url: "/api/Customers/chart",
-			contentType: 'application/json',
-			dataType: 'json',
-			success: function (data) {
+		self.request.sendRequest("GET", "/api/Customers/chart")
+			.done(function (data) {
 				var customersPerCountries = $.map(data,
 					function (array) { return array.CustomersCount; });
 				var countries = $.map(data,
@@ -149,12 +123,8 @@ var CusViewModel = function () {
 							lineTension: 0,
 						}]
 					}
-				});		
-			},
-			error: function (error) {
-				alert('Error: ' + error.responseJSON.ExceptionMessage);
-			}
-		});
+				});
+			});
 	};
 
 	function updateData() {
@@ -163,6 +133,7 @@ var CusViewModel = function () {
 	};
 
 	updateData();
+	self.getCountries();
 };
 
 ko.applyBindings(new CusViewModel()); 
